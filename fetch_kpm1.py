@@ -4,7 +4,11 @@ import html
 import json
 import re
 import sys
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from .env file
+load_dotenv()
 
 # Đảm bảo in tiếng Việt và emoji không bị lỗi UnicodeEncodeError trên Windows CMD
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
@@ -63,10 +67,20 @@ def clean_description(raw_desc_str):
     return clean_text.strip()
 
 # 1. Cấu hình thông tin API
-URL = "https://kpm.oanglelab.com/api/task/getList?id=5247&search=&isShowTaskAssigned=false"
-BEARER_TOKEN = (
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6WyI0MjA4IiwiNDIwOCJdLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjpbIlJvc2UiLCJSb3NlIl0sInVuaXF1ZV9uYW1lIjoiUm9zZSIsInN1YiI6IlJvc2UiLCJqdGkiOiIwNmU4ZDJiZi0xNjNhLTRlN2MtYWE2NS02ZjYzMWI2NDczNTkiLCJpYXQiOjE3OTEyNTYxNzcsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlByb2plY3QgQXNzaXN0YW50IiwiQXNwTmV0LklkZW50aXR5LlNlY3VyaXR5U3RhbXAiOiJKS1BEVzZYTU1QQlRJRlZZV0FRM0hEN0QyMjNXU0tOUCIsIm5iZiI6MTc5MTI1NjE3NywiZXhwIjoxNzkzODQ4MTc3LCJpc3MiOiJJVE8iLCJhdWQiOiJJVE8ifQ.FqkOyhkbWyzSTWKFTNSjFstJL0E-DEiTTEPhlhVpw3Q"  # Giữ nguyên token của bạn
-)
+URL = os.getenv("URL")
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Accept": "*/*",
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {BEARER_TOKEN}",
+    "Cookie": "tk_or=%22%22; tk_lr=%22%22",
+}
+
+# Cấu hình Token và Chat ID Telegram của bạn
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -285,10 +299,6 @@ def fetch_and_save_tasks():
     conn.commit()
     conn.close()
     print("✅ Đã kiểm tra biến động và cập nhật xong!")
-
-# Cấu hình Token và Chat ID Telegram của bạn
-TELEGRAM_BOT_TOKEN = "8619542589:AAH1bS-UDVm-PW_KPh9j-LNrykW_DV4Ifxw"  # Thay bằng Token từ BotFather
-TELEGRAM_CHAT_ID = "8818660317"  # Thay bằng Chat ID vừa lấy được
 
 
 def send_telegram_notification(title, detail_text, task_id, assignee=""):
